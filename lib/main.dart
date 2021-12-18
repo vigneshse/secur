@@ -16,7 +16,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Secur',
       theme: ThemeData(
-          primarySwatch: Colors.lightGreen, backgroundColor: Colors.yellow),
+          primarySwatch: Colors.teal,
+          primaryColor: Colors.blueGrey,
+          backgroundColor: Colors.yellow,
+          scaffoldBackgroundColor: Colors.black12),
       home: const MyHomePage(title: 'Password with Salt'),
     );
   }
@@ -33,10 +36,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _password = "";
   final textController = TextEditingController();
+  FocusNode focusNode = FocusNode();
 
   void _generatePassword(String saltKey) {
     setState(() {
-        _password = SecureGenerator.generateRandomSecure(true)+SecureGenerator.saltSecret(saltKey);
+      _password = SecureGenerator.generateRandomSecure(true) +
+          SecureGenerator.saltSecret(saltKey);
     });
   }
 
@@ -50,38 +55,63 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        elevation: 50.0,
+        leading: const Icon(Icons.account_circle_rounded),
+        shadowColor: Colors.teal,
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextField(
-                decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    hintText: 'Enter salt key'),
-                controller: textController,
-                showCursor: true,
-                maxLength: 3,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.done,
-                autofocus: true,
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              SelectableText.rich(
-                TextSpan(
-                  text: _password,
-                  style: Theme.of(context).textTheme.headline4,
+              Container(
+                alignment: Alignment.topLeft,
+                child: const Text(
+                  "Salt Key",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.teal,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-              CupertinoButton.filled(
-                onPressed: () => _generatePassword(textController.text),
-                child: const Text('Generate Secur'),
-              )
+              Container(
+                alignment: Alignment.topLeft,
+                child: TextField(
+                  decoration:
+                      const InputDecoration(contentPadding: EdgeInsets.zero),
+                  controller: textController,
+                  showCursor: true,
+                  maxLength: 3,
+                  focusNode: focusNode,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                child: SelectableText.rich(
+                  TextSpan(
+                    text: _password,
+                    style: const TextStyle(color: Colors.teal, fontSize: 20),
+                  ),
+                ),
+              ),
+              Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.all(50.0),
+                  child: CupertinoButton.filled(
+                    onPressed: () => _generatePassword(textController.text),
+                    child: const Text('Generate Secur'),
+                  ))
             ],
           ),
         ),
@@ -92,6 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     textController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 }
